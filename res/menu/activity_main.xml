@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_add_entries"
+        android:title="Add fake DB entries"
+        android:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_exit"
+        android:title="Exit"
+        android:showAsAction="never"/>
+</menu>

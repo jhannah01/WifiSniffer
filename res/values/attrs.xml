@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Key for SHA1: 1A:73:21:90:3F:2E:C2:23:0C:3E:BB:7D:3F:DD:DC:6A:69:14:52:FA -->
+    <string name="google_maps_api_key_dbg">AIzaSyAFdUv2yIMJAXPw6Pbtm7JnGEjfva3KL7Y</string>    
+</resources>

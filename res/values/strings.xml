@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">WifiSniffer</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">WifiSniffer</string>
+    <string name="filler_bssid">00:de:ad:be:ef:11</string>
+    <string name="filler_ssid">wifiSSID</string>
+    <string name="filler_timestamp">Timestamp: Jan 12th 08:45 PM</string>
+    <string name="filler_level">Level: -35 dBm</string>
+    <string name="filler_capabilities">Security: [WPA2-PSK-TKIP][WPA][ESS]</string>
+    <string name="filler_frequency">Frequency: 2530 MHz</string>
+    <string name="filler_records">6</string>
+    <string name="content_description_wifi_icon">Wireless Security Indiciator</string>
+    <string name="content_description_signal_indicator">Signal indicator</string>
+    <string name="title_overview_fragment">Results Overview:</string>
+    <string name="label_records">Records:</string>
+    <string name="label_lastseen">Last Seen:</string>
+    <string name="label_level">Signal Strength:</string>
+    <string name="label_frequency">Frequency:</string>
+    <string name="label_capabilities">Security:</string>
+    <string name="label_timestamp">Seen at:</string>
+    <string name="label_results">Results:</string>
+
+</resources>

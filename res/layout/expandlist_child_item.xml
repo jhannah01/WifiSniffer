@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_child_holder"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/layout_child_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/label_child_level"
+            style="@style/MediumText.Alt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_level" />
+
+        <TextView
+            android:id="@+id/textview_child_level"
+            style="@style/MediumText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:text="@string/filler_level" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_child_frequency"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/layout_child_level"
+        android:layout_centerHorizontal="true" >
+
+        <TextView
+            android:id="@+id/label_child_frequency"
+            style="@style/MediumText.Alt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_frequency" />
+
+        <TextView
+            android:id="@+id/textview_child_frequency"
+            style="@style/MediumText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:text="@string/filler_frequency" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_child_capabilities"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_child_level"
+        android:layout_marginLeft="15dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/label_child_capabilities"
+            style="@style/MediumText.Alt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_capabilities" />
+
+        <TextView
+            android:id="@+id/textview_child_capabilities"
+            style="@style/MediumText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:text="@string/filler_capabilities" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_child_graph"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/layout_child_capabilities"
+        android:orientation="vertical"/>
+
+</RelativeLayout>

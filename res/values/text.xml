@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<color name="primary_text_color">@android:color/primary_text_dark</color>
+	<color name="secondary_text_color">@android:color/holo_blue_dark</color>
+    <color name="alt_text_color">@android:color/holo_green_light</color>
+    <color name="bar_background_color">#ff000000</color>
+       	 
+    <style name="SmallText" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">10sp</item>
+    </style>
+    <style name="SmallText.Italic" parent="@style/SmallText">
+    	<item name="android:textStyle">italic</item>
+    </style>
+    <style name="SmallText.Alt" parent="@style/SmallText">
+        <item name="android:textColor">@color/secondary_text_color</item>
+    </style>
+    <style name="SmallText.Alt.Italic" parent="@style/SmallText.Alt">
+    	<item name="android:textStyle">italic</item>
+    </style>
+    
+    
+    <style name="MediumText" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="MediumText.Italic" parent="@style/MediumText">
+    	<item name="android:textStyle">italic</item>
+    </style>
+    <style name="MediumText.Alt" parent="@style/MediumText">
+        <item name="android:textColor">@color/secondary_text_color</item>
+    </style>
+    <style name="MediumText.Alt.Italic" parent="@style/MediumText.Alt">
+       	<item name="android:textStyle">italic</item>
+    </style>
+    
+    <style name="NormalText" parent="@android:style/TextAppearance">
+        <item name="android:textSize">19sp</item>
+        <item name="android:textColor">@color/primary_text_color</item>
+    </style>
+    <style name="NormalText.Italic" parent="@style/NormalText">
+        <item name="android:textStyle">italic</item>
+    </style>
+    <style name="NormalText.Alt" parent="@style/NormalText">
+        <item name="android:textColor">@color/alt_text_color</item>
+    </style>
+    <style name="NormalText.Alt.Italic" parent="@style/NormalText.Alt">
+        <item name="android:textStyle">italic</item>
+    </style>
+    
+    <style name="LargeText" parent="@android:style/TextAppearance.Large">
+    	<item name="android:textSize">24sp</item>
+    	<item name="android:textColor">@color/primary_text_color</item>
+    </style>
+    <style name="LargeText.Italic" parent="@style/LargeText">
+        <item name="android:textStyle">italic</item>
+    </style>
+    <style name="LargeText.Alt" parent="@style/LargeText">
+    	<item name="android:textColor">@color/secondary_text_color</item>    
+    </style>
+    <style name="LargeText.Alt.Italic" parent="@style/LargeText.Alt">
+        <item name="android:textStyle">italic</item>
+    </style>
+</resources>

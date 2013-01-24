@@ -1,0 +1,103 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detail_fragment_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:paddingBottom="5dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="5dp"
+    tools:context=".fragments.OverviewFragment">
+
+    <TextView
+        android:id="@+id/text_details_Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:text="@string/title_overview_fragment"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="25sp"
+        android:textStyle="bold|italic"/>
+
+    <TextView
+        android:id="@+id/text_details_BSSID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/text_details_SSID"
+        android:layout_below="@+id/text_details_SSID"
+        android:layout_marginLeft="15dp"
+        android:text="@string/filler_bssid"
+        android:textColor="@android:color/darker_gray"/>
+
+    <TextView
+        android:id="@+id/text_details_Level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/image_details_Security"
+        android:layout_below="@+id/text_details_BSSID"
+        android:layout_marginTop="30dp"
+        android:text="@string/filler_level"/>
+
+    <TextView
+        android:id="@+id/text_details_Frequency"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        
+        android:layout_alignLeft="@+id/text_details_Level"
+        android:layout_below="@+id/text_details_Level"
+        android:layout_marginTop="10dp"
+        android:text="@string/filler_frequency"/>
+
+    <TextView
+        android:id="@+id/text_details_Capabilities"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        
+        android:layout_alignLeft="@+id/text_details_Frequency"
+        android:layout_below="@+id/text_details_Frequency"
+        android:layout_marginTop="10dp"
+        android:text="@string/filler_capabilities"/>
+
+    <TextView
+        android:id="@+id/text_details_Timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        
+        android:layout_alignLeft="@+id/text_details_Capabilities"
+        android:layout_below="@+id/text_details_Capabilities"
+        android:layout_marginTop="10dp"
+        android:text="@string/filler_timestamp"/>
+
+    <TextView
+        android:id="@+id/text_details_SSID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/image_details_Security"
+        android:layout_toRightOf="@+id/image_details_Security"
+        android:text="@string/filler_ssid"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <ImageView
+        android:id="@+id/image_details_Signal"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignBottom="@+id/text_details_Level"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/text_details_Level"
+        android:contentDescription="@string/content_description_signal_indicator"
+        android:src="@drawable/ic_bars_green"/>
+
+    <ImageView
+        android:id="@+id/image_details_Security"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_details_Title"
+        android:layout_toLeftOf="@+id/text_details_Title"
+        android:contentDescription="@string/content_description_wifi_icon"
+        android:src="@drawable/ic_wifi_green"/>
+
+</RelativeLayout>
