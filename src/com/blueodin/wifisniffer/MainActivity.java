@@ -1,137 +1,173 @@
-
 package com.blueodin.wifisniffer;
 
-import android.app.ActionBar;
-import android.app.FragmentTransaction;
-import android.net.Uri;
+import java.util.List;
+
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.app.Fragment;
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Activity;
+import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.blueodin.wifisniffer.fragments.HistoricalFragment;
-import com.blueodin.wifisniffer.fragments.MainDetailFragment;
 import com.blueodin.wifisniffer.fragments.MapDetailFragment;
 import com.blueodin.wifisniffer.fragments.OverviewFragment;
+import com.blueodin.wifisniffer.fragments.WifiListFragment;
 import com.blueodin.wifisniffer.fragments.WifiListFragment.IClickHandler;
-import com.blueodin.wifisniffer.providers.ScanResultsProvider;
+import com.blueodin.wifisniffer.helpers.TabContentFragment;
 import com.blueodin.wifisniffer.providers.WifiScanContract;
 import com.blueodin.wifisniffer.providers.WifiScanResult;
+import com.blueodin.wifisniffer.services.ScanResultsReceiver;
+import com.blueodin.wifisniffer.services.WifiLockService;
 import com.blueodin.wifisniffer.R;
 
-public class MainActivity extends Activity implements ActionBar.TabListener, IClickHandler {
-    private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
-    private static final int TAB_OVERVIEW = 0;
-    private static final int TAB_MAP = 1;
-    private static final int TAB_HISTORY = 2;
+public class MainActivity extends Activity implements IClickHandler {
+	public static final String FLAG_FROM_NOTIFICATION = "arg_from_notification";
+	private MenuItem mToggleScanningItem;
+	private boolean mIsScanning = false;
+    private Location mLastLocation;
+    private LocationManager mLocationManager;
     
-    private WifiScanResult mItem;
-    
-    public interface IUpdateFragment {
-        void updateSelectedItem(WifiScanResult result);
-        void parseArguments(Bundle arguments);
-    }
-    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        setContentView(R.layout.activity_main);
-        
-        final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        
-        actionBar.addTab(actionBar.newTab().setText("Overview").setTabListener(this));
-        actionBar.addTab(actionBar.newTab().setText("Map").setTabListener(this));
-        actionBar.addTab(actionBar.newTab().setText("History").setTabListener(this));
-    }
+	private ScanResultsReceiver mResultsReceiver = new ScanResultsReceiver() {
+		@Override
+		public void updateResults(List<ScanResult> results) {
+			if(mLastLocation == null)
+				mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			
+			for (ScanResult result : results)
+				getContentResolver().insert(
+						WifiScanContract.Results.CONTENT_URI,
+						WifiScanResult.fromWifiScanResult(result, mLastLocation)
+								.getContentValues());
 
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM))
-            getActionBar().setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
-    }
+			Log.d(TAG, "Inserted " + results.size() + " entries into the DB");
+		}
+	};
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putInt(STATE_SELECTED_NAVIGATION_ITEM,getActionBar().getSelectedNavigationIndex());
-    }
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.menu_add_entries:
-                addFakeEntries();
-                return true;
-            case R.id.menu_exit:
-                finish();
-                return true;
-        }
-        
-        return super.onOptionsItemSelected(item);
-    }
-    
-    private void addFakeEntries() {
-        WifiScanResult[] results = {
-                new WifiScanResult("00:11:22:33:44:55", "fakeAP", -45, 2505, "[WEP][ESS]", System.currentTimeMillis()),
-                new WifiScanResult("ba:db:ee:fd:ea:d1", "myWiFi", -32, 2100, "[WPA2-PSK-TKIP][WPS][ESS]", System.currentTimeMillis() - (30*1000)),
-                new WifiScanResult("fe:f0:dd:00:44:11", "wireless", -55, 2350, "[WPA2-PSK-TKIP][ESS]", System.currentTimeMillis() - (40*1000)),
-                new WifiScanResult("00:11:22:33:44:55", "fakeAP", -45, 2505, "[WEP][ESS]", System.currentTimeMillis() - (5*60*1000)),
-                new WifiScanResult("ba:db:ee:fd:ea:d1", "myWiFi", -32, 2100, "[WPA2-PSK-TKIP][WPS][ESS]", System.currentTimeMillis() - (6*60*1000)),
-                new WifiScanResult("fe:f0:dd:00:44:11", "wireless", -55, 2350, "[WPA2-PSK-TKIP][ESS]", System.currentTimeMillis() - (7*60*1000))
-        };
-        
-        for(WifiScanResult r : results)
-            getContentResolver().insert(WifiScanContract.ScanResult.CONTENT_URI, r.getContentValues());
-    }
+		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		
+		setContentView(R.layout.activity_main);
+		
+		final ActionBar actionBar = getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionBar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
+		
+		
+		actionBar.addTab(actionBar.newTab()
+				.setText("Overview")
+				.setTabListener(new TabListener(new OverviewFragment())));
+		
+		actionBar.addTab(actionBar.newTab()
+				.setText("Historical")
+				.setTabListener(new TabListener(new HistoricalFragment())));
+		
+		actionBar.addTab(actionBar.newTab()
+				.setText("Map Results")
+				.setTabListener(new TabListener(new MapDetailFragment())));
+		
+		getFragmentManager().beginTransaction()
+			.add(R.id.main_left_fragment, new WifiListFragment())
+			.commit();
+	}
+	
+	public class TabListener implements ActionBar.TabListener {
+		private TabContentFragment mFragment;
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        Fragment f;
-        
-        switch(tab.getPosition()) {
-            case TAB_OVERVIEW:
-                f = new OverviewFragment();
-                break;
-            case TAB_MAP:
-                f = new MapDetailFragment();
-                break;
-            case TAB_HISTORY:
-                f = new HistoricalFragment();
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid Tab Position: #" + tab.getPosition());
-        }
-        
-        Bundle args = new Bundle();
-        args.putParcelable(MainDetailFragment.ARG_ITEM, mItem);
-        f.setArguments(args);
-        
-        getFragmentManager().beginTransaction()
-            .replace(R.id.container, f)
-            .commit();
-    }
+		public TabListener(TabContentFragment fragment) {
+			mFragment = fragment;
+		}
 
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+			ft.add(R.id.main_detail_fragment, mFragment);
+		}
 
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+			ft.remove(mFragment);
+		}
 
-    @Override
-    public void onItemSelected(WifiScanResult result) {
-        IUpdateFragment f = (IUpdateFragment)getFragmentManager().findFragmentById(R.id.container);
-        f.updateSelectedItem(result);
-    }
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+			WifiListFragment f = (WifiListFragment)getFragmentManager().findFragmentById(R.id.main_left_fragment);
+			mFragment.updateTabContent((WifiScanResult)f.getListView().getSelectedItem());
+		}
+
+	}
+
+	@Override
+	public void onPause() {
+		if(mIsScanning)
+			unregisterReceiver(mResultsReceiver);
+		super.onPause();
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if(mIsScanning)
+			registerReceiver(mResultsReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_main, menu);
+		mToggleScanningItem = menu.findItem(R.id.menu_toggle_scanning);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_toggle_scanning:
+			toggleScanning();
+			return true;
+		case R.id.menu_exit:
+			finish();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	private void toggleScanning() {
+		if (mIsScanning) {
+			stopScanning();
+			mToggleScanningItem.setChecked(false).setIcon(
+					R.drawable.ic_action_wifi);
+		} else {
+			startScanning();
+			mToggleScanningItem.setChecked(true).setIcon(
+					R.drawable.ic_wifi_orange);
+		}
+
+		mIsScanning = !mIsScanning;
+	}
+
+	private void startScanning() {
+		Intent serviceIntent = new Intent(this, WifiLockService.class);
+		startService(serviceIntent);
+		registerReceiver(mResultsReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+	}
+
+	private void stopScanning() {
+		unregisterReceiver(mResultsReceiver);
+		stopService(new Intent(this, WifiLockService.class));
+	}
+
+	@Override
+	public void onItemSelected(WifiScanResult result) {
+		((TabContentFragment)getFragmentManager().findFragmentById(R.id.main_detail_fragment)).updateTabContent(result);
+	}
 }

@@ -1,5 +1,13 @@
 package com.blueodin.wifisniffer.fragments;
 
+import java.text.DateFormat;
+import java.util.Date;
+
+import com.blueodin.wifisniffer.helpers.DBHelper;
+import com.blueodin.wifisniffer.providers.WifiScanContract;
+import com.blueodin.wifisniffer.providers.WifiScanResult;
+import com.blueodin.wifisniffer.R;
+
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
@@ -9,157 +17,146 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.format.DateUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.blueodin.wifisniffer.R;
-import com.blueodin.wifisniffer.providers.WifiScanResult;
-import com.blueodin.wifisniffer.providers.WifiScanContract;
+public class WifiListFragment extends ListFragment implements
+		LoaderManager.LoaderCallbacks<Cursor> {
+	private static final String STATE_ACTIVATED_POSITION = "state_activated_position";
+	private static final int LOADER_ID = 0x01;
+	private IClickHandler mCallbacks = mDefaultClickHandler;
+	private int mActivatedPosition;
+	private WifiResultAdapter mListAdapter;
 
-public class WifiListFragment extends ListFragment
-    implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String STATE_ACTIVATED_POSITION = "activated_position";
-    private static final int LOADER_ID = 0x01;
-    private int mActivatedPosition = ListView.INVALID_POSITION;
-    private IClickHandler mCallbacks = mDefaultClickHandler;
-    private ArrayAdapter<WifiScanResult> mAdapter;
+	private final static String[] mProjection = new String[] {
+			DBHelper.ResultsColumns._ID, DBHelper.ResultsColumns.COLUMN_BSSID,
+			DBHelper.ResultsColumns.COLUMN_SSID,
+			DBHelper.ResultsColumns.COLUMN_LEVEL,
+			DBHelper.ResultsColumns.COLUMN_TIMESTAMP,
+			DBHelper.ResultsColumns._COUNT };
 
-    public interface IClickHandler {
-        public void onItemSelected(WifiScanResult result);
-    }
+	private static int[] mOutProjection = new int[] { 0, R.id.textBSSID,
+			R.id.textSSID, R.id.textLevel, R.id.textTimestamp, R.id.textRecords };
 
-    private static IClickHandler mDefaultClickHandler = new IClickHandler() {
-        @Override
-        public void onItemSelected(WifiScanResult result) {
-        }
-    };
+	public interface IClickHandler {
+		public void onItemSelected(WifiScanResult result);
+	}
 
-    
-    public WifiListFragment() {
-        
-    }
-    
-    public class ScanResultsAdapter extends ArrayAdapter<WifiScanResult> {
-        private Context mContext;
-        
-        public ScanResultsAdapter(Context context) {
-            super(context, R.layout.wifiscanresult_list_row, R.id.textSSID);
-            mContext = context;
-        }
-        
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.wifiscanresult_list_row, parent, false);
-            
-            WifiScanResult item = (WifiScanResult)this.getItem(position);
-            
-            ((TextView)v.findViewById(R.id.textSSID)).setText(item.ssid);
-            ((TextView)v.findViewById(R.id.textBSSID)).setText(item.bssid);
-            ((TextView)v.findViewById(R.id.textLevel)).setText(String.format("Level: %d dBm", item.level));
-            ((TextView)v.findViewById(R.id.textTimestamp)).setText("Timestamp: " + DateUtils.getRelativeTimeSpanString(item.timestamp));
-            ((ImageView)v.findViewById(R.id.imageViewIcon)).setImageResource(item.getSecurityIcon());
-            
-            return v;
-        }    
-    }
+	private static IClickHandler mDefaultClickHandler = new IClickHandler() {
+		@Override
+		public void onItemSelected(WifiScanResult result) {
+		}
+	};
 
-    
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        getLoaderManager().initLoader(LOADER_ID, null, this);
-        mAdapter = new ScanResultsAdapter(getActivity());
-        
-        setListAdapter(mAdapter);
-    }
-    
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+	public WifiListFragment() {
 
-        // Restore the previously serialized activated item position.
-        if (savedInstanceState != null
-                && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-        }
-        
-        setEmptyText("No entries...");
-    }
+	}
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+	public class WifiResultAdapter extends SimpleCursorAdapter {
 
-        if (!(activity instanceof IClickHandler))
-            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+		private SimpleCursorAdapter.ViewBinder mViewBinder = new SimpleCursorAdapter.ViewBinder() {
 
-        mCallbacks = (IClickHandler) activity;
-    }
+			@Override
+			public boolean setViewValue(View view, Cursor cursor,
+					int columnIndex) {
+				switch (view.getId()) {
+				case 0:
+					return true;
+				case R.id.textTimestamp:
+					((TextView) view).setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM).format(new Date(cursor.getLong(columnIndex))));
+					return true;
+				case R.id.textLevel:
+					((TextView) view).setText(String.format("%d dBm",
+							cursor.getInt(columnIndex)));
+					return true;
+				case R.id.textRecords:
+					((TextView) view).setText("#" + cursor.getInt(columnIndex));
+					return true;
+				}
+				return false;
+			}
+		};
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mCallbacks = mDefaultClickHandler;
-    }
+		public WifiResultAdapter(Context context) {
+			super(context, R.layout.wifiscanresult_list_row, null, mProjection,
+					mOutProjection,
+					SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+			setViewBinder(mViewBinder);
+		}
+	}
 
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        super.onListItemClick(listView, view, position, id);
-        mCallbacks.onItemSelected(mAdapter.getItem(position));
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+		mListAdapter = new WifiResultAdapter(getActivity());
+		setListAdapter(mListAdapter);
+	}
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mActivatedPosition != ListView.INVALID_POSITION)
-            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
-    }
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
 
-    public void setActivateOnItemClick(boolean activateOnItemClick) {
-        getListView().setChoiceMode(activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
-    }
+		if (!(activity instanceof IClickHandler))
+			throw new IllegalStateException(
+					"Activity must implement fragment's callbacks.");
 
-    private void setActivatedPosition(int position) {
-        if (position == ListView.INVALID_POSITION)
-            getListView().setItemChecked(mActivatedPosition, false);
-        else
-            getListView().setItemChecked(position, true);
+		mCallbacks = (IClickHandler) activity;
+	}
 
-        mActivatedPosition = position;
-    }
-    
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return (new CursorLoader(getActivity(), WifiScanContract.ScanResult.CONTENT_URI, 
-               WifiScanContract.ScanResult.DEFAULT_PROJECTION, null, null, null));
-    }
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mCallbacks = mDefaultClickHandler;
+	}
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if((data == null) || (data.getCount() <= 1))
-            return;
-        
-        data.moveToFirst();
-        while(!data.isAfterLast()) {
-            mAdapter.add(WifiScanResult.fromCursor(data));
-            data.moveToNext();
-        }
+	@Override
+	public void onListItemClick(ListView listView, View view, int position,
+			long id) {
+		Cursor c = (Cursor) this.mListAdapter.getItem(position);
 
-        mAdapter.notifyDataSetChanged();
-    }
+		Cursor data = getActivity().getContentResolver().query(
+				WifiScanContract.Results.uriById(c.getLong(c
+						.getColumnIndex(DBHelper.ResultsColumns._ID))), null,
+				null, null, null);
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        
-    }
+		data.moveToFirst();
+		WifiScanResult result = WifiScanResult.fromCursor(data);
+		data.close();
+
+		mCallbacks.onItemSelected(result);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		if (mActivatedPosition != ListView.INVALID_POSITION)
+			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+	}
+
+	public void setActivateOnItemClick(boolean activateOnItemClick) {
+		getListView().setChoiceMode(
+				activateOnItemClick ? ListView.CHOICE_MODE_SINGLE
+						: ListView.CHOICE_MODE_NONE);
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		return (new CursorLoader(getActivity(),
+				WifiScanContract.Results.CONTENT_UNIQUE_URI, mProjection, null, null,
+				null));
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		this.mListAdapter.swapCursor(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		this.mListAdapter.swapCursor(null);
+
+	}
 }

@@ -8,40 +8,44 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blueodin.wifisniffer.R;
+import com.blueodin.wifisniffer.helpers.TabContentFragment;
 import com.blueodin.wifisniffer.providers.WifiScanResult;
 
-public class OverviewFragment extends MainDetailFragment {
-    public OverviewFragment() {
-        
-    }
-   
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_overview, container, false);
+public class OverviewFragment extends TabContentFragment {
 
-        if(mItem == null)
-            return v;
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		if (container == null)
+			return null;
 
-        updateItemDetails(v);
-        
-        return v;
-    }
+		return inflater.inflate(R.layout.fragment_overview, container, false);
+	}
 
-    private void updateItemDetails(View v) {
-        ((TextView)v.findViewById(R.id.text_details_BSSID)).setText("BSSID: " + mItem.bssid);
-        ((TextView)v.findViewById(R.id.text_details_SSID)).setText(mItem.ssid);
-        ((TextView)v.findViewById(R.id.text_details_Level)).setText(String.format("Level: %d dBm", mItem.level));
-        ((TextView)v.findViewById(R.id.text_details_Frequency)).setText(String.format("Frequency: %d MHz", mItem.frequency));
-        ((TextView)v.findViewById(R.id.text_details_Capabilities)).setText("Security: " + mItem.getFormattedCapabilities());
-        ((TextView)v.findViewById(R.id.text_details_Timestamp)).setText(mItem.getFormattedTimestamp());
-        ((ImageView)v.findViewById(R.id.image_details_Signal)).setImageResource(mItem.getSignalIcon());
-        ((ImageView)v.findViewById(R.id.image_details_Security)).setImageResource(mItem.getSecurityIcon());
-    }
+	@Override
+	public void updateTabContent(WifiScanResult result) {
+		View v = getView();
+		
+		if (v == null)
+			return;
 
-    @Override
-    public void updateSelectedItem(WifiScanResult result) {
-        this.mItem = result;
-        updateItemDetails(getView());
-    }
+		((TextView) v.findViewById(R.id.text_details_BSSID)).setText("BSSID: "
+				+ result.bssid);
+		((TextView) v.findViewById(R.id.text_details_SSID))
+				.setText(result.ssid);
+		((TextView) v.findViewById(R.id.text_details_Level)).setText(String
+				.format("Level: %d dBm", result.level));
+		((TextView) v.findViewById(R.id.text_details_Frequency)).setText(String
+				.format("Frequency: %d MHz", result.frequency));
+		((TextView) v.findViewById(R.id.text_details_Capabilities))
+				.setText("Security: " + result.getFormattedCapabilities());
+		((TextView) v.findViewById(R.id.text_details_Timestamp)).setText(result
+				.getFormattedTimestamp());
+		((ImageView) v.findViewById(R.id.image_details_Signal))
+				.setImageResource(result.getSignalIcon());
+		((ImageView) v.findViewById(R.id.image_details_Security))
+				.setImageResource(result.getSecurityIcon());
+	}
+
+	/**/
 }

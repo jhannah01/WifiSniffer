@@ -1,8 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menu_add_entries"
-        android:title="Add fake DB entries"
-        android:showAsAction="never"/>
+        android:id="@+id/menu_toggle_scanning"
+        android:title="Toggle Scanning"
+        android:icon="@drawable/ic_action_wifi"
+        android:checkable="true"
+        android:checked="false"
+        android:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_exit"
         android:title="Exit"

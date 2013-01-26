@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.MapDetailFragment" >
+
+	<TextView
+	    android:id="@+id/text_mapdetail_Title"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginBottom="10dp"
+	    android:gravity="center_horizontal"
+	    android:text="@string/title_mapdetail_fragment"
+	    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	<FrameLayout
+	    android:id="@+id/map_detail_fragment"
+	    android:layout_width="match_parent"
+	    android:layout_height="fill_parent" />
+
+</LinearLayout>

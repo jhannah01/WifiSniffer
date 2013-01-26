@@ -1,15 +1,13 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/detail_fragment_layout"
-    android:layout_width="match_parent"
+    android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
     android:paddingBottom="5dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
     android:paddingTop="5dp"
-    tools:context=".fragments.OverviewFragment">
+    tools:context=".fragments.OverviewFragment" >
 
     <TextView
         android:id="@+id/text_details_Title"
@@ -19,9 +17,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="15dp"
         android:text="@string/title_overview_fragment"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="25sp"
-        android:textStyle="bold|italic"/>
+        android:textAppearance="@style/LargeText.Alt"
+        android:textColor="@color/alt_text_color"
+        android:textStyle="bold|italic" />
 
     <TextView
         android:id="@+id/text_details_BSSID"
@@ -83,13 +81,13 @@
 
     <ImageView
         android:id="@+id/image_details_Signal"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignBottom="@+id/text_details_Level"
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/text_details_Level"
         android:contentDescription="@string/content_description_signal_indicator"
-        android:src="@drawable/ic_bars_green"/>
+        android:src="@drawable/ic_bars_green" />
 
     <ImageView
         android:id="@+id/image_details_Security"

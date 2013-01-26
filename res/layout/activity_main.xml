@@ -3,21 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    tools:context="com.blueodin.wifisniffer.MainActivity">
-
-    <fragment
-        android:id="@+id/network_list"
-        android:name="com.blueodin.wifisniffer.fragments.WifiListFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        class="com.blueodin.wifisniffer.fragments.WifiListFragment"
-        tools:layout="@layout/wifiscanresult_list_row"/>
+    android:baselineAligned="false">
 
     <FrameLayout
-        android:id="@+id/container"
+        android:id="@+id/main_left_fragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
+        
+    <FrameLayout 
+        android:id="@+id/main_detail_fragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="2"/>
-
 </LinearLayout>

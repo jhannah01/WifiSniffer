@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
 
     <ImageView
         android:id="@+id/imageViewIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:contentDescription="@string/content_description_wifi_icon"
         android:cropToPadding="true"
         android:maxHeight="30dp"
         android:maxWidth="30dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_wifi_green"/>
+        android:src="@drawable/ic_wifi_green" />
 
     <LinearLayout
+        android:id="@+id/layoutDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/imageViewIcon"
         android:orientation="vertical"
-        android:padding="4dp">
+        android:padding="4dp" >
 
         <TextView
             android:id="@+id/textSSID"
@@ -29,7 +31,7 @@
             android:gravity="center"
             android:text="@string/filler_ssid"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/holo_blue_dark"/>
+            android:textColor="@android:color/holo_blue_dark" />
 
         <TextView
             android:id="@+id/textBSSID"
@@ -39,28 +41,63 @@
             android:text="@string/filler_bssid"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@android:color/darker_gray"
-            android:textSize="12sp"/>
-
+            android:textSize="12sp" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textLevel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        android:text="@string/filler_level"
-        android:textColor="@android:color/holo_orange_dark"/>
 
     <TextView
         android:id="@+id/textTimestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="2dp"
+        android:layout_marginTop="2dp"
         android:gravity="right"
         android:text="@string/filler_timestamp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/black"
-        android:textSize="13sp"/>
+        android:textAppearance="@style/MediumText.Italic" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/textLevel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/labelLevel"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/labelLevel"
+        android:text="@string/filler_level"
+        android:textAppearance="@style/MediumText" />
+
+    <TextView
+        android:id="@+id/textRecords"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/labelRecords"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/labelRecords"
+        android:text="@string/filler_records"
+        android:textAppearance="@style/MediumText" />
+
+    <TextView
+        android:id="@+id/labelLevel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/layoutDetails"
+        android:gravity="right"
+        android:text="@string/label_level"
+        android:textAppearance="@style/MediumText.Alt" />
+
+    <TextView
+        android:id="@+id/labelRecords"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/textLevel"
+        android:layout_alignBottom="@+id/textLevel"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/textLevel"
+        android:gravity="right"
+        android:text="@string/label_records"
+        android:textAppearance="@style/MediumText.Alt" />
+
+</RelativeLayout>

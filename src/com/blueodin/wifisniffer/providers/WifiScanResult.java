@@ -3,13 +3,17 @@ package com.blueodin.wifisniffer.providers;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.blueodin.wifisniffer.R;
+import com.blueodin.wifisniffer.helpers.DBHelper;
 import com.blueodin.wifisniffer.providers.WifiScanContract;
 
 import java.util.ArrayList;
@@ -23,51 +27,57 @@ public class WifiScanResult implements Parcelable
     public int level;
     public int frequency;
     public String capabilities;
-    public long timestamp;
+    public double longitude;
+	public double latitude;
+	public double altitude;
+	public long timestamp;
 
     private static final String TAG = WifiScanResult.class.toString();
 
     public WifiScanResult() {
     }
 
-    public WifiScanResult(String bssid, String ssid, int level, int frequency, String capabilities,
-            long timestamp)
+    public WifiScanResult(String bssid, String ssid, int level, int frequency, String capabilities, double longitude, double latitude, double altitude, long timestamp)
     {
         this.bssid = bssid;
         this.ssid = ssid;
         this.level = level;
         this.frequency = frequency;
         this.capabilities = capabilities;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.altitude = altitude;
         this.timestamp = timestamp;
     }
 
     public static final Parcelable.Creator<WifiScanResult> CREATOR = new Parcelable.Creator<WifiScanResult>()
     {
         @Override
-        public WifiScanResult createFromParcel(Parcel parcel)
-        {
-            return new WifiScanResult(parcel);
-        }
+        public WifiScanResult createFromParcel(Parcel parcel) { return new WifiScanResult(parcel); }
 
         @Override
-        public WifiScanResult[] newArray(int i)
-        {
-            return new WifiScanResult[i];
-        }
+        public WifiScanResult[] newArray(int i) { return new WifiScanResult[i]; }
     };
 
-    private WifiScanResult(Parcel in)
+    protected WifiScanResult(Parcel in)
     {
         bssid = in.readString();
         ssid = in.readString();
         level = in.readInt();
         frequency = in.readInt();
         capabilities = in.readString();
+        longitude = in.readInt();
+        latitude = in.readInt();
+        altitude = in.readInt();
         timestamp = in.readLong();
     }
 
     public String getFormattedTimestamp() {
         return (String) DateFormat.format("MMM dd, yyyy h:mmaa", this.timestamp);
+    }
+    
+    public String getRelativeTimestamp(Context context) {
+    	return (String) DateUtils.formatDateTime(context, this.timestamp, DateUtils.FORMAT_ABBREV_RELATIVE); 
     }
 
     public String getFormattedCapabilities() {
@@ -109,12 +119,15 @@ public class WifiScanResult implements Parcelable
 
         try {
             entry = new WifiScanResult(
-                    cursor.getString(cursor.getColumnIndex(WifiScanContract.ScanResult.COLUMN_NAME_BSSID)), // BSSID
-                    cursor.getString(cursor.getColumnIndex(WifiScanContract.ScanResult.COLUMN_NAME_SSID)), // SSID
-                    cursor.getInt(cursor.getColumnIndex(WifiScanContract.ScanResult.COLUMN_NAME_LEVEL)), // Level
-                    cursor.getInt(cursor.getColumnIndex(WifiScanContract.ScanResult.COLUMN_NAME_FREQUENCY)), // Frequency
-                    cursor.getString(cursor.getColumnIndex(WifiScanContract.ScanResult.COLUMN_NAME_CAPABILITIES)), // Capabilities
-                    cursor.getLong(cursor.getColumnIndex(WifiScanContract.ScanResult.COLUMN_NAME_TIMESTAMP))); // Timestamp
+                    cursor.getString(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_BSSID)),
+                    cursor.getString(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_SSID)),
+                    cursor.getInt(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_LEVEL)),
+                    cursor.getInt(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_FREQUENCY)),
+                    cursor.getString(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_CAPABILITIES)),
+                    cursor.getDouble(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_LONGITUDE)),
+                    cursor.getDouble(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_LATITUDE)),
+                    cursor.getDouble(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_ALTITUDE)),
+                    cursor.getLong(cursor.getColumnIndex(DBHelper.ResultsColumns.COLUMN_TIMESTAMP)));
         } catch (Exception ex) {
             Log.e(TAG, "Unable to parse cursor to retrieve network entry: '" + ex.toString() + "'");
             return null;
@@ -122,15 +135,29 @@ public class WifiScanResult implements Parcelable
 
         return entry;
     }
+    
+    public static WifiScanResult fromWifiScanResult(android.net.wifi.ScanResult result, Location location) {
+    	double lat = 0, lon = 0, alt = 0;
+    	if(location != null) {
+    		lat = location.getLatitude();
+    		lon = location.getLongitude();
+    		alt = location.getAltitude();
+    	}
+    	
+    	return new WifiScanResult(result.BSSID, result.SSID, result.level, result.frequency, result.capabilities, lon, lat, alt, System.currentTimeMillis());
+    }
 
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
-        values.put(WifiScanContract.ScanResult.COLUMN_NAME_BSSID, bssid);
-        values.put(WifiScanContract.ScanResult.COLUMN_NAME_SSID, ssid);
-        values.put(WifiScanContract.ScanResult.COLUMN_NAME_LEVEL, level);
-        values.put(WifiScanContract.ScanResult.COLUMN_NAME_FREQUENCY, frequency);
-        values.put(WifiScanContract.ScanResult.COLUMN_NAME_CAPABILITIES, capabilities);
-        values.put(WifiScanContract.ScanResult.COLUMN_NAME_TIMESTAMP, timestamp);
+        values.put(DBHelper.ResultsColumns.COLUMN_BSSID, bssid);
+        values.put(DBHelper.ResultsColumns.COLUMN_SSID, ssid);
+        values.put(DBHelper.ResultsColumns.COLUMN_LEVEL, level);
+        values.put(DBHelper.ResultsColumns.COLUMN_FREQUENCY, frequency);
+        values.put(DBHelper.ResultsColumns.COLUMN_CAPABILITIES, capabilities);
+        values.put(DBHelper.ResultsColumns.COLUMN_LONGITUDE, longitude);
+        values.put(DBHelper.ResultsColumns.COLUMN_LATITUDE, latitude);
+        values.put(DBHelper.ResultsColumns.COLUMN_ALTITUDE, altitude);
+        values.put(DBHelper.ResultsColumns.COLUMN_TIMESTAMP, timestamp);
         return values;
     }
 
@@ -138,8 +165,8 @@ public class WifiScanResult implements Parcelable
     @Override
     public String toString()
     {
-        return String.format("ScannedResult(bssid=%s,ssid=%s,level=%d,frequency=%d,capabilities=%s,timestamp=%d)",
-                        bssid, ssid, level, frequency, capabilities, timestamp);
+        return String.format("ScannedResult(bssid=%s,ssid=%s,level=%d,frequency=%d,capabilities=%s,longitude=%d,latitude=%d,altitude=%d,timestamp=%d)",
+        		bssid, ssid, level, frequency, capabilities, longitude, latitude, altitude, timestamp);
     }
 
     public int getSignalIcon() {
@@ -155,7 +182,7 @@ public class WifiScanResult implements Parcelable
         if(level >= -80)
             return R.drawable.ic_bars_one;
         
-        return R.drawable.ic_bars_none;
+        return R.drawable.ic_action_bars;
     }
     
     public int getSecurityIcon() {
